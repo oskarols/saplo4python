@@ -69,7 +69,7 @@ class SaploJSONClient:
                         1501:     "No matching results was found",
                         1502:     "Couldn't find any match with that id",
                         }
-        def __init__(self,apikey, secretkey):
+        def __init__(self,apikey, secretkey, token=None):
                 """
                 Initiates the Saplo JSONClient using the secret & api keys
                 @type String
@@ -77,8 +77,9 @@ class SaploJSONClient:
                 @type String
                 @param Saplo Secret key
                 """
-                self.apikey    = apikey
-                self.secretkey = secretkey
+                self.apikey     = apikey
+                self.secretkey  = secretkey
+                self.token      = token
                 self.__createSession(self.apikey, self.secretkey)
         def getArticle(self,corpusId, articleId):
                 """
