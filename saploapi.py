@@ -174,7 +174,7 @@ class SaploJSONClient:
                 params = (corpusName,corpusDesc,lang)
                 response = self.__doRequest('corpus.createCorpus', params)
                 return self.__handleJSONResponse(response.read())
-        def addArticle(self,corpusId, headline, lead, body, publishStart, publishUrl, authors):
+        def addArticle(self,corpusId, headline, lead, body, publishStart, publishUrl, authors, lang):
                 '''
                 Add a new article to a corpus.
                 If you are adding an article that already exists (the combination of headline+body+publishUrl) then the id for that article will be returned.
@@ -202,7 +202,7 @@ class SaploJSONClient:
                         corpusId    Number        A unique corpus id.
                         articleId   Number        The id for the new article.
                 '''
-                params = (corpusId, headline, lead, body, publishStart, publishUrl, authors,'sv')
+                params = (corpusId, headline, lead, body, publishStart, publishUrl, authors,lang)
                 response = self.__doRequest('corpus.addArticle', params)
                 return self.__handleJSONResponse(response.read())
         def getCorpusPermission(self):
