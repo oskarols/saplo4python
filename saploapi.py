@@ -13,7 +13,7 @@ class SaploError(Exception):
 
 
 class SaploJSONClient:
-         """
+        """
          Saplo JSON Client.
          Handles authentication and json-requests to the saplo API Server.
 
@@ -119,22 +119,25 @@ class SaploJSONClient:
                 params = (corpusId, articleId,waiton)
                 response = self.__doRequest('tags.getEntityTags', params)
                 return self.__handleJSONResponse(response.read())
-        def getSimilarArticles(self,sourceCorpusId, sourceArticleId,againstCorpusIds, waiton):
+        def getSimilarArticles(self,corpusId, articleId, wait, numberOfResults, threshold):
                 """
                 Searches the corpus you provide and looking for articles that has a similar semantic meaning as your source article.
                 The request gives you a list with a maximum of 50 articles that are similar to the source article.
                
                 @type Number
-                @param sourceCorpusId   - The unique id for the corpus where the source article is stored.
+                @param corpusId   - The unique id for the corpus where the source article is stored.
                 @type Number
-                @param sourceArticleId  - The id for the article to which you want to find similar articles.
-                @type Array
-                @param againstCorpusIds - An array containing all corpus ids where you want to search for similar articles
+                @param articleId  - The id for the article to which you want to find similar articles.
                 @type Number
-                @param waitOn           - This param specifies if you want to wait until a result has been calculated or
-                if you want to just start a search and come back later to fetch the result. We RECOMMEND you to use waitOn = 0.
+                @param wait           - This param specifies if you want to wait until a result has been calculated or
+                if you want to just start a search and come back later to fetch the result. We RECOMMEND you to use wait = 0.
                 On high load the calculation might not be able to process all requests and then its better to add a search to the queue and fetch the result later.
-       
+                @type Number
+                @param numberOfResults - How many results that will be returned (default 10).
+                @type Int
+                @param threshold - The threshold for how similar an article should be (default 0.75)
+                
+                
                 @rtype dictionary
                 @return
                         matchId            Number        an id for the result based on your sourceCorpusId and sourceArticleId.
@@ -145,11 +148,8 @@ class SaploJSONClient:
                                 The scale goes from 0.00 to 1.00. A result of 1 equals the exact same article.
                
                 """
-                #Json-rpc-java compatible list
-                javarpcList = {'javaClass':"java.util.ArrayList",
-                                'list':againstCorpusIds}
 
-                params = [sourceCorpusId, sourceArticleId,javarpcList,waiton]
+                params = [corpusId, articleId, wait, numberOfResults, threshold]
                 response = self.__doRequest('match.getSimilarArticles', params)
                 return self.__handleJSONResponse(response.read())
         def createCorpus(self,corpusName, corpusDesc, lang):
@@ -315,7 +315,7 @@ class SaploJSONClient:
 
 
                 @type Number
-                @param corpusId  - 	 The corpus id for where the article you want get similarity for exists 
+                @param corpusId -   The corpus id for where the article you want get similarity for exists 
                 @type Number
                 @param articleId   -    The article id for your source article 
                 @type Array
