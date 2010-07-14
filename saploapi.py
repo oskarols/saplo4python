@@ -119,7 +119,7 @@ class SaploJSONClient:
                 params = (corpusId, articleId,waiton)
                 response = self.__doRequest('tags.getEntityTags', params)
                 return self.__handleJSONResponse(response.read())
-        def getSimilarArticles(self,corpusId, articleId, wait, numberOfResults, threshold):
+        def getSimilarArticles(self,corpusId, articleId, wait, numberOfResults, threshold, againstCorpusIds=None):
                 """
                 Searches the corpus you provide and looking for articles that has a similar semantic meaning as your source article.
                 The request gives you a list with a maximum of 50 articles that are similar to the source article.
@@ -136,6 +136,8 @@ class SaploJSONClient:
                 @param numberOfResults - How many results that will be returned (default 10).
                 @type Int
                 @param threshold - The threshold for how similar an article should be (default 0.75)
+                @type Array
+                @param againstCorpusIds - An array containing all corpus ids where you want to search for similar articles
                 
                 
                 @rtype dictionary
@@ -148,8 +150,10 @@ class SaploJSONClient:
                                 The scale goes from 0.00 to 1.00. A result of 1 equals the exact same article.
                
                 """
+                
+                javarpcList = {'javaClass':"java.util.ArrayList",'list':againstCorpusIds}
 
-                params = [corpusId, articleId, wait, numberOfResults, threshold]
+                params = [corpusId, articleId, wait, numberOfResults, threshold, javarpcList]
                 response = self.__doRequest('match.getSimilarArticles', params)
                 return self.__handleJSONResponse(response.read())
         def createCorpus(self,corpusName, corpusDesc, lang):
