@@ -268,7 +268,38 @@ class SaploJSONClient:
                         contextDescription  String    The context description provided when context was created.
                 """
                 response = self.__doRequest('context.listContexts',())
-                return self.__handleJSONResponse(response.read())        
+                return self.__handleJSONResponse(response.read()) 
+        def deleteContext(self, contextId):
+            """
+            Deletes an existing context
+            
+            @type Int
+            @param contextId - ID for the context you want to delete.
+            @return 
+                    boolean
+            
+            
+            """
+            params = [contextId]
+            response = self.__doRequest('context.deleteContext',params)
+            return self.__handleJSONResponse(response.read())
+        def updateContext(self, contextId, contextName, contextDescription):
+            """
+            Update an existing contexts name and/or description.
+            
+            @type Int
+            @param contextId - Id for the context you want to update
+            @type String
+            @param contextName - The contexts name
+            @type String
+            @param contextDescription - A description for your context
+            
+            @return 
+                boolean
+            """
+            params = (contextId, contextName, contextDescription)
+            response = self.__doRequest('context.updateContext',params)
+            return self.__handleJSONResponse(response.read())              
         def addContextArticles(self, contextId, corpusId, articleIds):
                 """
                 Add articles that you like to a specified context.
