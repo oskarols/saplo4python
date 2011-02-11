@@ -69,6 +69,7 @@ class SaploJSONClient:
                         1501:     "No matching results was found",
                         1502:     "Couldn't find any match with that id",
                         }
+                        
         def __init__(self,apikey, secretkey, token=None):
                 """
                 Initiates the Saplo JSONClient using the secret & api keys
@@ -81,6 +82,7 @@ class SaploJSONClient:
                 self.secretkey  = secretkey
                 self.token      = token
                 self.__createSession(self.apikey, self.secretkey)
+                
         def getArticle(self,corpusId, articleId):
                 """
                 Gives information about the saved headline and publish url for a specific article.
@@ -99,6 +101,7 @@ class SaploJSONClient:
                 params = (corpusId, articleId)
                 response = self.__doRequest('corpus.getArticle', params)
                 return self.__handleJSONResponse(response.read())
+                
         def getEntityTags(self,corpusId, articleId, waiton):
                 """
                 Gives you the persons, organisations and geographical names (places) that are mentioned within an article/text.
@@ -119,6 +122,7 @@ class SaploJSONClient:
                 params = (corpusId, articleId,waiton)
                 response = self.__doRequest('tags.getEntityTags', params)
                 return self.__handleJSONResponse(response.read())
+                
         def getSimilarArticles(self,corpusId, articleId, wait, numberOfResults, minThreshold, maxThreshold):
                 """
                 Searches the corpus you provide and looking for articles that has a similar semantic meaning as your source article.
@@ -134,11 +138,11 @@ class SaploJSONClient:
                 On high load the calculation might not be able to process all requests and then its better to add a search to the queue and fetch the result later.
                 @type Number
                 @param numberOfResults - How many results that will be returned (default 10).
-                @type Int
-                @param threshold - The threshold for how similar an article should be (default 0.75)
-                @type Array
-                @param againstCorpusIds - An array containing all corpus ids where you want to search for similar articles
-                
+                @type Float
+                @param minThreshold - If you only want similar articles that are 50 percent like your source article, provide 0.5 as param.
+                @type Float
+                @param maxThreshold - If you only want similar articles that are like your source article to a max of 90 %, provide 0.9 as param.
+
                 
                 @rtype dictionary
                 @return
@@ -148,12 +152,12 @@ class SaploJSONClient:
                         resultArticleId    Number        id for the similar article
                         resultValue        Number    value of how similar the result article is.
                                 The scale goes from 0.00 to 1.00. A result of 1 equals the exact same article.
-               
                 """
 
                 params = [corpusId, articleId, wait, numberOfResults, minThreshold, maxThreshold]
                 response = self.__doRequest('match.getSimilarArticles', params)
                 return self.__handleJSONResponse(response.read())
+                
         def createCorpus(self,corpusName, corpusDesc, lang):
                 """
                 Creates a new corpus (container to store articles and texts in) and returns an id to the created corpus.
@@ -176,6 +180,7 @@ class SaploJSONClient:
                 params = (corpusName,corpusDesc,lang)
                 response = self.__doRequest('corpus.createCorpus', params)
                 return self.__handleJSONResponse(response.read())
+                
         def addArticle(self,corpusId, headline, lead, body, publishStart, publishUrl, authors, lang):
                 '''
                 Add a new article to a corpus.
@@ -207,6 +212,7 @@ class SaploJSONClient:
                 params = (corpusId, headline, lead, body, publishStart, publishUrl, authors,lang)
                 response = self.__doRequest('corpus.addArticle', params)
                 return self.__handleJSONResponse(response.read())
+                
         def getCorpusPermission(self):
                 """
                 Gives you a list to all corpus ids that you have read or write permission to.
@@ -219,6 +225,7 @@ class SaploJSONClient:
                 """
                 response = self.__doRequest('corpus.getPermissions',() )
                 return self.__handleJSONResponse(response.read())
+                
         def getCorpusInfo(self,corpusId):
                 """
                 Gives you the name, description and the last article id for a specific corpus.
@@ -255,6 +262,7 @@ class SaploJSONClient:
                 params = (contextName,contextDescription)
                 response = self.__doRequest('context.createContext', params)
                 return self.__handleJSONResponse(response.read())
+                
         def getContexts(self):
                 """
                 Gives you the id, name and description of all the created contexts.
@@ -266,7 +274,8 @@ class SaploJSONClient:
                         contextDescription  String    The context description provided when context was created.
                 """
                 response = self.__doRequest('context.listContexts',())
-                return self.__handleJSONResponse(response.read()) 
+                return self.__handleJSONResponse(response.read())
+                
         def deleteContext(self, contextId):
             """
             Deletes an existing context
@@ -275,12 +284,11 @@ class SaploJSONClient:
             @param contextId - ID for the context you want to delete.
             @return 
                     boolean
-            
-            
             """
             params = [contextId]
             response = self.__doRequest('context.deleteContext',params)
             return self.__handleJSONResponse(response.read())
+            
         def updateContext(self, contextId, contextName, contextDescription):
             """
             Update an existing contexts name and/or description.
@@ -297,7 +305,8 @@ class SaploJSONClient:
             """
             params = (contextId, contextName, contextDescription)
             response = self.__doRequest('context.updateContext',params)
-            return self.__handleJSONResponse(response.read())              
+            return self.__handleJSONResponse(response.read())
+                          
         def addContextArticles(self, contextId, corpusId, articleIds):
                 """
                 Add articles that you like to a specified context.
@@ -320,6 +329,7 @@ class SaploJSONClient:
                 params = [contextId, corpusId,javarpcList]
                 response = self.__doRequest('context.addLikeArticles', params)
                 return self.__handleJSONResponse(response.read())
+                
         def deleteContextArticles(self, contextId, corpusId, articleIds):
                 """
                 Delete articles that you have added from a specified context.
@@ -341,8 +351,9 @@ class SaploJSONClient:
 
                 params = [contextId, corpusId,javarpcList]
                 response = self.__doRequest('context.deleteLikeArticles', params)
-                return self.__handleJSONResponse(response.read()) 
-        def getContextSimilarity(self, corpusId, articleId, againstContextIds):
+                return self.__handleJSONResponse(response.read())
+                
+        def getContextSimilarity(self, corpusId, articleId, againstContextIds, threshold, limit, wait):
                 """
                 Get how semantically like an article are to a list of contexts.
 
@@ -350,9 +361,15 @@ class SaploJSONClient:
                 @type Number
                 @param corpusId -   The corpus id for where the article you want get similarity for exists 
                 @type Number
-                @param articleId   -    The article id for your source article 
+                @param articleId -    The article id for your source article 
                 @type Array
                 @param articleIds -     A java formatted ArrayList containing all context ids you want to get similarity for.
+                @type Float
+                @param threshold -      Threshold for how like answers must be. E.g. 0.8 is 80 percent similar.
+                @type Integer
+                @param limit -          Number of max answers.
+                @type Integer
+                @param wait -           How long you maximum want to wait for an answer before shutting down the connection. (Max 120 sec)
 
                 @rtype Bool
                 @return
@@ -363,7 +380,7 @@ class SaploJSONClient:
                 javarpcList = {'javaClass':"java.util.ArrayList",
                                 'list':againstContextIds}
 
-                params = [corpusId,articleId,javarpcList]
+                params = [corpusId,articleId,javarpcList, threshold, limit, wait]
                 response = self.__doRequest('context.getContextSimilarity', params)
                 return self.__handleJSONResponse(response.read()) 
         
@@ -390,6 +407,7 @@ class SaploJSONClient:
                 result = json.loads(jsonresponse)
                 token  = result['result']
                 self.__setTokenTo(token)
+                
         def __doRequest(self, meth, param,sapid=0):
                 '''
                 Creates an JSON request to the server from the params
@@ -406,11 +424,13 @@ class SaploJSONClient:
                 request  = urllib2.Request(url,options)
                 response = urllib2.urlopen(request)
                 return response
+                
         def __setTokenTo(self, t):
                 '''
                 Sets the class token string to the given param
                 '''
                 self.token = t;
+                
         def __handleJSONResponse(self, jsonresponse):
                 response = json.loads(jsonresponse)
                 #If errors, handle them
