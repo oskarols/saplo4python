@@ -1,4 +1,6 @@
-import json,urllib,urllib2
+import json
+import urllib
+import urllib2
 
 class SaploError(Exception):
         """
@@ -25,10 +27,11 @@ class SaploJSONClient:
                 client.createCorpus("My new Corpus", "Some description text", "sv")
                 client.addArticle(corpusId, TitleString, LeadString, BodyString, Date, "someurl.com", "some author")
                 client.getEntityTags(corpusId, articleId, waittime)
-                client.getSimilarArticles(corpusId,articleId,(id1,id2), waittime)
+                client.getSimilarArticles(corpusId, articleId, wait, numberOfResults, minThreshold, maxThreshold)
                 client.getCorpusPermission()
         except SaploError, err:
                 print err.__str__()
+                
         """
         url         = "http://api.saplo.com/rpc/json;jsessionid={token}"
         apikey      = ''
@@ -244,6 +247,20 @@ class SaploJSONClient:
                 response = self.__doRequest('corpus.getInfo',params)
                 return self.__handleJSONResponse(response.read())
                 
+        def deleteCorpus(self, corpusId):
+            """
+            Removes the entire corpus, articles included.
+            
+            @type Number
+            @param corpusId The unique id for the corpus you want to delete.
+            @rtype Dictionary
+            @return 
+                    Bool        Returns whether the corpus was successfully deleted or not.         
+            """
+            params = [corpusId]
+            response = self.__doRequest('corpus.deleteCorpus',params)
+            return self.__handleJSONResponse(response.read())
+                
         def createContext(self,contextName,contextDescription):
                 """
                 Creates a new context for your user which articles can be matched against. 
@@ -417,6 +434,7 @@ class SaploJSONClient:
                         method = meth,
                         params = param,
                         id=sapid))
+                        
                 #Parse the url-string to contain our session-token
                 url = self.url.format(token = self.token)
 
