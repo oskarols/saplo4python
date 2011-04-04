@@ -37,41 +37,6 @@ class SaploJSONClient:
         apikey      = ''
         secretkey   = ''
         token       = ''
-        errorCodes = {  
-                        501:      "No matching results",
-                        592:      "Undocumented error",
-                        899:      "Unknown error",
-                        1001:     "Missing required field(s).",
-                        1002:     "Sorry, this language is not yet supported",
-                        1003:     "Processing request.",
-                        1004:     "Sorry, still processing but I'm working as fast as I can.",
-                        1005:     "Sorry, your max waiting time was reached, but I'm still processing.",
-                        1006:     "No results was found.",
-                        1101:     "API-key and Secret-key incorrect",
-                        1201:     "No permission for that operation on the corpus",
-                        1202:     "No corpus exists for user, need to create corpus first",
-                        1203:     "Max number of corpus exceeded",
-                        1204:     "No article exists with that id in that corpus",
-                        1205:     "Article already exists",
-                        1206:     "Article language and corpus language doesn't match.",
-                        1207:     "No corpus with that id.",
-                        1208:     "Wrong date format. Should be YYYY-MM-DD HH:MM:SS",
-                        1209:     "You need to provide a body text.",
-                        1210:     "A corpus name is required.",
-                        1301:     "Couldn't find any tags for this article",
-                        1302:     "Couldn't find any tag with that id",
-                        1303:     "No blacklist exists",
-                        1304:     "Blackword already exists",
-                        1305:     "No tag word was provided",
-                        1306:     "No such tag type id exists",
-                        1401:     "No context exists",
-                        1402:     "No permission for that operation on the f",
-                        1403:     "No context name provided",
-                        1404:     "Maximum limit of contexts reached",
-                        1405:     "Context with provided name already exists",
-                        1501:     "No matching results was found",
-                        1502:     "Couldn't find any match with that id",
-                        }
                         
         def __init__(self,apikey, secretkey, token=None):
                 """
@@ -453,20 +418,13 @@ class SaploJSONClient:
                 response = json.loads(jsonresponse)
                 #If errors, handle them
                 if "error" in response:
-                        errormsg  =  "" if ('msg'  not in response['error']) else response['error']['msg']
+                        errormsg  =  "Unknown error" if ('msg'  not in response['error']) else response['error']['msg']
                         errorcode =  "" if ('code' not in response['error']) else response['error']['code']                    
-
-                        errorcodeStr = ""
-                        if errorcode in self.errorCodes.keys():
-                                errorcodeStr = self.errorCodes[errorcode]
-                        else:
-                                errorcodeStr = " Unknown error"
+                        
                         #Create a readable error message
-                        msg = "An error has occured: '{errormessage}' With code = ({errorcode}) {errorcodeString}".format(
+                        msg = "An error has occured: '{errormessage}' With code = ({errorcode})".format(
                                         errormessage = errormsg,
                                         errorcode    = errorcode,
-                                        errorcodeString    = errorcodeStr
-
                                         );
                         #Raise an SaploError
                         raise SaploError(msg)
